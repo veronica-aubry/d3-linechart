@@ -1,0 +1,12 @@
+.container {
+  font-family: 'Nunito', sans-serif;
+  width: 500px;
+  margin-top: 200px;
+  background-color: white;
+  border-radius: 40px;
+  padding: 30px 40px;
+}
+
+body {
+  background-color: #ff8c1a;
+}
