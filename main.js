@@ -1,72 +1,60 @@
-var legislator = {
-  name: 'Ron Wyden',
-  sectors: [
-    {
-      money_from_pacs: 589360,
-      money_from_indivs: 1109475,
-      sector_name: 'Finance/Insur/RealEst'
-    },
-    {
-      money_from_pacs: 782240,
-      money_from_indivs: 479476,
-      sector_name: 'Health'
-    },
-    {
-      money_from_pacs: 184676,
-      money_from_indivs: 638566,
-      sector_name: 'Lawyers & Lobbyists'
-    },
-    {
-      money_from_pacs: 104350,
-      money_from_indivs: 71799,
-      sector_name: 'Transportation'
-    }
-  ]
-}
 
-var data = [];
 
-for (var i = 0; i < legislator.sectors.length; i++){
-	var item = legislator.sectors[i].money_from_pacs
-	data.push(item)
-}
 
-// var data = [58.936,78.224,18.4676,10.435]
+var data = _.map( [58.936,78.224,18.4676,10.435, 30.552, 40.765, 20.866, 90.34],
+function(d) {
+  return {
+    x: d + 3,
+    y: 250 - d,
+    r: 2
+  };
+});
 
-var h = 250;
-var w = 600;
+var margin = {top:0, right:0, bottom:15, left:0};
+
+var h = 250 - margin.top - margin.bottom;
+
+var w = 600 - margin.left - margin.right;
 
 var yScale = d3.scale.linear()
-  .domain([0, d3.max(data)*1.1])
+  .domain([0, d3.max(data, function(data) {
+    return data.y;
+  }
+  )])
   .range([0, h])
 
-var xScale = d3.scale.ordinal()
-  .domain(data)
-  .rangeBands([0,w], 0.5, 0.25 )
+var xScale = d3.scale.linear()
+  .domain([0,100])
+  .range([0,w])
 
-var colorScale = d3.scale.quantize()
-  .domain([0, 1, data.length-1, data.length])
-  .range(['tomato', 'gold', 'cornflowerBlue'])
+var colorScale = d3.scale.linear()
+  .domain([0, d3.max(data)])
+  .range(['gold', 'tomato'])
 
 var svg = d3.select('#barChart').append('svg')
-  .attr('width', w)
-  .attr('height', h)
+  .attr('width', w + margin.left + margin.right)
+  .attr('height', h + margin.top + margin.bottom)
+  .append('g')
+  .attr('transform', 'translate('+margin.left+', '+margin.top+')');
 
-svg.selectAll('rect')
+svg.selectAll('circle')
 .data(data)
 .enter()
-.append('rect')
-.attr('class', 'bar')
-.attr('x', function(data, index){
-  return xScale(data)
+.append('circle')
+.attr('class', 'scatter')
+.attr('cx', function(data){
+  return xScale(data.x)
 })
-.attr('y', function(data){
-  return h - yScale(data)
+.attr('cy', function(data){
+  return yScale(data.y)
+})
+.attr('r', function(data){
+  return data.r
 })
 .attr('width', xScale.rangeBand)
 .style('height', function(data){
     return yScale(data)
 })
 .attr('fill', function(data, index){
-  return colorScale(index)
+  return colorScale(data)
 })
